@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, Menu, X } from 'lucide-react';
 import { ConnectWallet } from './connectWallet';
+import { NavLink } from 'react-router';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,12 +19,12 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="/quiz" className="text-gray-300 hover:text-white transition-colors">
+            <NavLink to="/quizzes" className="text-gray-300 hover:text-white transition-colors">
               Quiz
-            </a>
-            <a href="/articles" className="text-gray-300 hover:text-white transition-colors">
+            </NavLink>
+            <NavLink to="/articles" className="text-gray-300 hover:text-white transition-colors">
               Articles
-            </a>
+            </NavLink>
             <a href="/write" className="text-gray-300 hover:text-white transition-colors">
               Write
             </a>
