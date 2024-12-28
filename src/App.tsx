@@ -7,6 +7,8 @@ import { QuizPage } from "./pages/quiz";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import Layout from "./layout";
 import ArticlesTab from "./pages/articles";
+import SingleArticlePage from "./Pages/singleArticles";
+import ArticleWritingPage from "./Pages/writeArticles";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +28,16 @@ const router = createBrowserRouter([
       {
         path: "/articles",
         element: <ArticlesTab />,
+      },
+
+      {
+        path: "/articles/:id",
+        element: <SingleArticlePage />,
+      },
+
+      {
+        path: "/write",
+        element: <ArticleWritingPage />,
       },
     ],
   },
