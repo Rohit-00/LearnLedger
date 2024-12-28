@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router";
+import Web3 from "web3";
+import { ArticlesABI, CONTRACT_ADDRESS } from "../web3/articlesABI";
 
 interface Article {
   id: string;
@@ -20,55 +22,10 @@ const ArticlesTab = () => {
     "NFTs",
   ];
 
-  const articles: Article[] = [
-    {
-      id: "1",
-      title: "Introduction to Blockchain Technology",
-      difficulty: "Easy",
-      readTime: 10,
-      category: "Blockchain",
-      views: 1234,
-    },
-    {
-      id: "2",
-      title: "Advanced Smart Contract Development",
-      difficulty: "Hard",
-      readTime: 25,
-      category: "Smart Contracts",
-      views: 856,
-    },
-    {
-      id: "3",
-      title: "DeFi Protocols and Decentralized Finance",
-      difficulty: "Medium",
-      readTime: 15,
-      category: "DeFi",
-      views: 2145,
-    },
-    {
-      id: "4",
-      title: "How to Create an NFT Collection",
-      difficulty: "Easy",
-      readTime: 12,
-      category: "NFTs",
-      views: 1567,
-    },
-    {
-      id: "5",
-      title: "Web3 Authentication and Security",
-      difficulty: "Medium",
-      readTime: 20,
-      category: "Web3",
-      views: 987,
-    },
-  ];
-
+  const [articles, setArticles] = useState<Article[]>([]);
   const [activeCategory, setActiveCategory] = useState("All");
-
-  const filteredArticles =
-    activeCategory === "All"
-      ? articles
-      : articles.filter((article) => article.category === activeCategory);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const getDifficultyColor = (difficulty: Article["difficulty"]) => {
     switch (difficulty) {
@@ -83,6 +40,55 @@ const ArticlesTab = () => {
     }
   };
 
+  // Fetch articles from the smart contract
+  const fetchArticles = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      // Check if MetaMask is installed
+      if (!window.ethereum) {
+        setError("MetaMask is not installed. Please install it to continue.");
+        return;
+      }
+
+      // Connect to MetaMask
+      const web3 = new Web3(window.ethereum);
+      const contract = new web3.eth.Contract(ArticlesABI, CONTRACT_ADDRESS);
+
+      // Fetch articles from the smart contract
+      const articlesFromContract = await contract.methods.getArticles().call();
+
+      // Map the articles to match the Article interface
+      const mappedArticles: Article[] = articlesFromContract.map(
+        (article: any, index: number) => ({
+          id: index.toString(),
+          title: article.title,
+          difficulty: article.difficulty,
+          readTime: parseInt(article.readTime, 10),
+          category: article.category,
+          views: parseInt(article.views, 10),
+        })
+      );
+
+      setArticles(mappedArticles);
+    } catch (error: any) {
+      console.error(error);
+      setError("Failed to fetch articles. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
+  const filteredArticles =
+    activeCategory === "All"
+      ? articles
+      : articles.filter((article) => article.category === activeCategory);
+
   return (
     <div className="max-w-screen mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
       {/* Category Tabs */}
@@ -92,14 +98,11 @@ const ArticlesTab = () => {
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`
-                px-4 py-2 text-sm font-medium whitespace-nowrap
-                ${
-                  activeCategory === category
-                    ? "border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
-                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                }
-              `}
+              className={`px-4 py-2 text-sm font-medium whitespace-nowrap ${
+                activeCategory === category
+                  ? "border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
+                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              }`}
             >
               {category}
             </button>
@@ -108,38 +111,47 @@ const ArticlesTab = () => {
       </div>
 
       {/* Article Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredArticles.map((article) => (
-          <div
-            key={article.id}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow p-6"
-          >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              {article.title}
-            </h3>
-            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300 mb-4">
-              <span className={getDifficultyColor(article.difficulty)}>
-                {article.difficulty}
-              </span>
-              <span>{article.readTime} mins read</span>
-              <span>{article.views.toLocaleString()} views</span>
+      {loading ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500 dark:text-gray-400">
+            Loading articles...
+          </p>
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <p className="text-red-500 dark:text-red-400">{error}</p>
+        </div>
+      ) : filteredArticles.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredArticles.map((article) => (
+            <div
+              key={article.id}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow p-6"
+            >
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                {article.title}
+              </h3>
+              <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300 mb-4">
+                <span className={getDifficultyColor(article.difficulty)}>
+                  {article.difficulty}
+                </span>
+                <span>{article.readTime} mins read</span>
+                <span>{article.views.toLocaleString()} views</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  {article.category}
+                </span>
+                <Link to={`/articles/${article.id}`}>
+                  <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
+                    Read Article
+                  </button>
+                </Link>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                {article.category}
-              </span>
-              <Link to={`/articles/${article.id}`}>
-                <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
-                  Read Article
-                </button>
-              </Link>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Empty State */}
-      {filteredArticles.length === 0 && (
+          ))}
+        </div>
+      ) : (
         <div className="text-center py-12">
           <p className="text-gray-500 dark:text-gray-400">
             No articles found for this category.

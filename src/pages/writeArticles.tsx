@@ -1,20 +1,55 @@
 import React, { useState } from "react";
+import Web3 from "web3";
+import { ArticlesABI, CONTRACT_ADDRESS } from "../web3/articlesABI"
 
 const ArticleWritingPage = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("Blockchain");
   const [difficulty, setDifficulty] = useState("Beginner");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   const categories = ["Blockchain", "Web3", "Smart Contracts", "DeFi", "NFTs"];
   const difficulties = ["Beginner", "Intermediate", "Advanced"];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Logic to save the article, e.g., send data to the server or update the state
-    alert(
-      `Article submitted: \nTitle: ${title}\nCategory: ${category}\nDifficulty: ${difficulty}`
-    );
+
+    try {
+      setLoading(true);
+      setMessage("");
+
+      // Check if MetaMask is installed
+      if (!window.ethereum) {
+        setMessage("MetaMask is not installed. Please install it to continue.");
+        return;
+      }
+
+      // Connect to MetaMask
+      const web3 = new Web3(window.ethereum);
+      const accounts = await web3.eth.requestAccounts();
+      const userAddress = accounts[0];
+
+      // Initialize the smart contract
+      const contract = new web3.eth.Contract(ArticlesABI, CONTRACT_ADDRESS);
+
+      // Call the createArticle function
+      await contract.methods
+        .createArticle(title, content, category, difficulty)
+        .send({ from: userAddress });
+
+      setMessage("Article successfully submitted to the blockchain!");
+      setTitle("");
+      setContent("");
+      setCategory("Blockchain");
+      setDifficulty("Beginner");
+    } catch (error: any) {
+      console.error(error);
+      setMessage("An error occurred while submitting the article.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -22,6 +57,17 @@ const ArticleWritingPage = () => {
       <h1 className="text-3xl font-semibold text-gray-900 dark:text-white mb-6">
         Write an Article
       </h1>
+      {message && (
+        <div
+          className={`mb-6 p-4 rounded ${
+            message.includes("successfully")
+              ? "bg-green-100 text-green-700"
+              : "bg-red-100 text-red-700"
+          }`}
+        >
+          {message}
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Title */}
         <div>
@@ -110,8 +156,9 @@ const ArticleWritingPage = () => {
           <button
             type="submit"
             className="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
+            disabled={loading}
           >
-            Submit Article
+            {loading ? "Submitting..." : "Submit Article"}
           </button>
         </div>
       </form>
