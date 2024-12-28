@@ -4,8 +4,30 @@ import { ConnectWallet } from './components/connectWallet'
 import Navbar from './components/navbar'
 import  QuizTab  from './pages/quizzes'
 import { QuizPage } from './pages/quiz'
+import { createBrowserRouter, RouterProvider } from 'react-router'
+import Layout from './layout'
+
+const router = createBrowserRouter([
+  {
+    path : '/',
+    element : <Layout/>,
+    children: [
+      {
+        path : "/quiz",
+        element : <QuizPage/>
+      },
+    
+      {
+        path : "/quizzes",
+        element : <QuizTab/>
+      },
 
 
+    ]
+
+  },
+
+])
 
 
 function App() {
@@ -13,7 +35,7 @@ function App() {
 
   return (
     <>
-    <Navbar/>
+     <RouterProvider router={router}/>
     </>
   )
 }
