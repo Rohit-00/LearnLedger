@@ -7,6 +7,7 @@ import { QuizPage } from "./pages/quiz";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import Layout from "./layout";
 import ArticlesTab from "./pages/articles";
+import CreateQuiz from "./pages/createQuiz";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: "/articles",
         element: <ArticlesTab />,
+      },
+      {
+        path: "/createQuiz",
+        element: <CreateQuiz/>,
       },
     ],
   },
