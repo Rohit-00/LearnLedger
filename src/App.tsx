@@ -6,7 +6,7 @@ import QuizTab from "./pages/quizzes";
 import { QuizPage } from "./pages/quiz";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import Layout from "./layout";
-import ArticlesTab from "./Pages/articles";
+import ArticlesTab from "./pages/articles";
 
 const router = createBrowserRouter([
   {
@@ -14,7 +14,7 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        path: "/quiz",
+        path: "/quiz/:id",
         element: <QuizPage />,
       },
 
