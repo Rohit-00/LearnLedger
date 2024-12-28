@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router";
 
 interface Article {
   id: string;
@@ -127,9 +128,11 @@ const ArticlesTab = () => {
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 {article.category}
               </span>
-              <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
-                Read Article
-              </button>
+              <Link to={`/articles/${article.id}`}>
+                <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
+                  Read Article
+                </button>
+              </Link>
             </div>
           </div>
         ))}
