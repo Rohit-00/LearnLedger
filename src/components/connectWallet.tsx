@@ -49,7 +49,7 @@ export const ConnectWallet = () => {
                 const accounts: string[] = await web3Instance.eth.getAccounts();
                 if (accounts.length > 0) {
                     setAccount(accounts[0]);
-                    const contractInstance = new web3Instance.eth.Contract(
+                    new web3Instance.eth.Contract(
                         ABI,
                         "0x56a2777e796eF23399e9E1d791E1A0410a75E31b"
                     );
@@ -69,7 +69,7 @@ export const ConnectWallet = () => {
                 const accounts: string[] = await web3Instance.eth.getAccounts();
                 setAccount(accounts[0]);
 
-                const contractInstance = new web3Instance.eth.Contract(
+                 new web3Instance.eth.Contract(
                     ABI,
                     "0x56a2777e796eF23399e9E1d791E1A0410a75E31b"
                 );
