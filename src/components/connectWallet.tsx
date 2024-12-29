@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import  { useEffect, useState, useRef } from 'react';
 import Web3 from "web3";
 import { User } from 'lucide-react';
 import { ABI } from '../web3/ABI';
@@ -17,8 +17,6 @@ interface UserProfile {
 
 export const ConnectWallet = () => {
     const [account, setAccount] = useState<string | null>(null);
-    const [web3, setWeb3] = useState<Web3 | null>(null);
-    const [contract, setContract] = useState<any | null>(null);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -47,7 +45,6 @@ export const ConnectWallet = () => {
         const initializeWeb3 = async () => {
             if (window.ethereum) {
                 const web3Instance = new Web3(window.ethereum);
-                setWeb3(web3Instance);
 
                 const accounts: string[] = await web3Instance.eth.getAccounts();
                 if (accounts.length > 0) {
@@ -56,7 +53,6 @@ export const ConnectWallet = () => {
                         ABI,
                         "0x56a2777e796eF23399e9E1d791E1A0410a75E31b"
                     );
-                    setContract(contractInstance);
                 }
             }
         };
@@ -69,7 +65,6 @@ export const ConnectWallet = () => {
             try {
                 await window.ethereum.request({ method: "eth_requestAccounts" });
                 const web3Instance = new Web3(window.ethereum);
-                setWeb3(web3Instance);
 
                 const accounts: string[] = await web3Instance.eth.getAccounts();
                 setAccount(accounts[0]);
@@ -78,7 +73,6 @@ export const ConnectWallet = () => {
                     ABI,
                     "0x56a2777e796eF23399e9E1d791E1A0410a75E31b"
                 );
-                setContract(contractInstance);
             } catch (error) {
                 console.error("Error connecting to wallet:", error);
             }
