@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { User, Menu, X } from 'lucide-react';
 import { ConnectWallet } from './connectWallet';
 import { NavLink } from 'react-router';

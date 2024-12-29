@@ -102,7 +102,7 @@ const QuizPlay = () => {
         setScore(score + 1);
       }
       try {
-        const data = await contract.methods.submitAnswer(parseInt(id!), currentQuestion, selectedOption).send({from:account});
+         await contract.methods.submitAnswer(parseInt(id!), currentQuestion, selectedOption).send({from:account});
       } catch (err) {
         console.log(err);
       }
