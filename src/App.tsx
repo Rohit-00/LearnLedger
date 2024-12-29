@@ -1,13 +1,13 @@
-import { useState } from "react";
 import "./App.css";
 import QuizTab from "./pages/quizzes";
-import { QuizPage } from "./pages/quiz";
+import QuizPlay from "./pages/quiz";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import Layout from "./layout";
 import ArticlesTab from "./pages/articles";
 import SingleArticlePage from "./pages/singleArticles";
 import ArticleWritingPage from "./pages/writeArticles";
 import CreateQuiz from "./pages/createQuiz";
+import { Profile } from "./pages/profile";
 
 const router = createBrowserRouter([
   {
@@ -16,7 +16,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/quiz/:id",
-        element: <QuizPage />,
+        element: <QuizPlay />,
       },
 
       {
@@ -41,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: "/createQuiz",
         element: <CreateQuiz/>,
+      },
+      {
+        path: "/profile",
+        element: <Profile/>,
       },
     ],
   },

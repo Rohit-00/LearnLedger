@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Web3 from "web3";
 import { ArticlesABI, CONTRACT_ADDRESS } from "../web3/articlesABI";
@@ -18,6 +18,8 @@ const SingleArticlePage = () => {
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [timeSpent, setTimeSpent] = useState(0);
+  const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
 
   const getDifficultyColor = (difficulty: Article["difficulty"]) => {
     switch (difficulty) {
@@ -48,10 +50,10 @@ const SingleArticlePage = () => {
       const contract = new web3.eth.Contract(ArticlesABI, CONTRACT_ADDRESS);
 
       // Fetch article by ID from the smart contract
-      const articleFromContract = await contract.methods.getArticle(id).call();
+      const articleFromContract : any= await contract.methods.getArticle(id).call();
 
       // Map the article data to match the Article interface
-      const mappedArticle: Article = {
+      const mappedArticle: any = {
         id,
         title: articleFromContract.title,
         difficulty: articleFromContract.difficulty,
@@ -70,12 +72,112 @@ const SingleArticlePage = () => {
     }
   };
 
+  const incrementViewCount = async () => {
+    if (!article) return;
+
+    try {
+      // Check if MetaMask is installed
+      if (!window.ethereum) {
+        setError("MetaMask is not installed. Please install it to continue.");
+        return;
+      }
+
+      // Connect to MetaMask
+      const web3 = new Web3(window.ethereum);
+      const accounts = await web3.eth.requestAccounts();
+      const userAddress = accounts[0];
+
+      // Initialize the smart contract
+      const contract = new web3.eth.Contract(ArticlesABI, CONTRACT_ADDRESS);
+
+      // Call the incrementView function on the smart contract
+      await contract.methods.incrementView(id).send({ from: userAddress });
+
+      // Update the views in the local state
+      setArticle((prevArticle) => {
+        if (prevArticle) {
+          return { ...prevArticle, views: prevArticle.views + 1 };
+        }
+        return prevArticle;
+      });
+    } catch (error: any) {
+      console.error(error);
+      setError("Failed to increment views. Please try again.");
+    }
+  };
+
+  const rewardUser = async () => {
+    if (!article) return;
+
+    try {
+      // Check if MetaMask is installed
+      if (!window.ethereum) {
+        setError("MetaMask is not installed. Please install it to continue.");
+        return;
+      }
+
+      // Connect to MetaMask
+      const web3 = new Web3(window.ethereum);
+      const accounts = await web3.eth.requestAccounts();
+      const userAddress = accounts[0];
+
+      const contract = new web3.eth.Contract(ArticlesABI, CONTRACT_ADDRESS);
+
+      const result = await contract.methods
+        .rewardUser(userAddress, id)
+        .send({ from: userAddress });
+      if (result.events && result.events.UserRewarded) {
+        const rewardMessage = result.events.UserRewarded.returnValues.message;
+        alert(rewardMessage);
+      } else {
+        alert("You have been rewarded for reading the article!");
+      }
+    } catch (error: any) {
+      console.error(error);
+      setError("Failed to reward the user. Please try again.");
+    }
+  };
+
+  const handleScroll = () => {
+    const scrollableElement = document.getElementById("article-content");
+    if (!scrollableElement) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
+    // Check if the user has scrolled to the bottom of the article content
+    if (scrollTop + clientHeight >= scrollHeight) {
+      setHasScrolledToBottom(true);
+    }
+  };
+
+  const trackTimeSpent = () => {
+    const interval = setInterval(() => {
+      setTimeSpent((prevTime) => prevTime + 1);
+    }, 1000);
+
+    return interval;
+  };
+
   useEffect(() => {
     fetchArticle();
+    const timeInterval = trackTimeSpent();
+
+    // Clean up the interval when the component unmounts
+    return () => {
+      clearInterval(timeInterval);
+    };
   }, [id]);
 
+  useEffect(() => {
+    // Trigger view increment when the user has spent enough time and scrolled to the bottom
+    if (article && timeSpent >= article.readTime * 60 && hasScrolledToBottom) {
+      incrementViewCount();
+      rewardUser();
+      setHasScrolledToBottom(false); // Prevent multiple increments
+    }
+  }, [timeSpent, hasScrolledToBottom, article]);
+
   return (
-    <div className="max-w-screen-xl mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div className="w-full mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
       {loading ? (
         <div className="text-center py-12">
           <p className="text-gray-500 dark:text-gray-400">Loading article...</p>
@@ -106,7 +208,11 @@ const SingleArticlePage = () => {
           </div>
 
           {/* Article Content */}
-          <div className="max-w-3xl mx-auto text-gray-700 dark:text-gray-300 text-base sm:text-lg leading-relaxed">
+          <div
+            id="article-content"
+            className="max-w-3xl mx-auto text-gray-700 dark:text-gray-300 text-base sm:text-lg leading-relaxed"
+            onScroll={handleScroll}
+          >
             <p className="mb-4">{article.content}</p>
           </div>
 
@@ -120,10 +226,7 @@ const SingleArticlePage = () => {
             </a>
           </div>
 
-          {/* Footer */}
-          <footer className="mt-12 py-8 bg-gray-200 dark:bg-gray-800 text-center text-sm text-gray-600 dark:text-gray-400">
-            <p>&copy; 2024 Learn and Play. All rights reserved.</p>
-          </footer>
+        
         </>
       ) : (
         <div className="text-center py-12">

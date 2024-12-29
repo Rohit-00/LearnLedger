@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import Web3 from "web3";
-import { ArticlesABI, CONTRACT_ADDRESS } from "../web3/articlesABI"
+import { ArticlesABI, CONTRACT_ADDRESS } from "../web3/articlesABI";
 
 const ArticleWritingPage = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("Blockchain");
   const [difficulty, setDifficulty] = useState("Beginner");
+  const [readTime, setReadTime] = useState(0); // Add readTime state
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -34,9 +35,9 @@ const ArticleWritingPage = () => {
       // Initialize the smart contract
       const contract = new web3.eth.Contract(ArticlesABI, CONTRACT_ADDRESS);
 
-      // Call the createArticle function
+      // Call the createArticle function with readTime
       await contract.methods
-        .createArticle(title, content, category, difficulty)
+        .createArticle(title, content, category, difficulty, readTime) // Include readTime in the contract call
         .send({ from: userAddress });
 
       setMessage("Article successfully submitted to the blockchain!");
@@ -44,6 +45,7 @@ const ArticleWritingPage = () => {
       setContent("");
       setCategory("Blockchain");
       setDifficulty("Beginner");
+      setReadTime(0); // Reset readTime field
     } catch (error: any) {
       console.error(error);
       setMessage("An error occurred while submitting the article.");
@@ -53,7 +55,7 @@ const ArticleWritingPage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div className="w-full mx-auto p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <h1 className="text-3xl font-semibold text-gray-900 dark:text-white mb-6">
         Write an Article
       </h1>
@@ -149,6 +151,25 @@ const ArticleWritingPage = () => {
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Read Time */}
+        <div>
+          <label
+            htmlFor="readTime"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Read Time (in minutes)
+          </label>
+          <input
+            id="readTime"
+            type="number"
+            min="1"
+            className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+            value={readTime}
+            onChange={(e) => setReadTime(Number(e.target.value))}
+            required
+          />
         </div>
 
         {/* Submit Button */}

@@ -15,7 +15,7 @@ const Navbar = () => {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between">
           {/* Logo/Brand */}
-          <div className="text-white font-bold text-xl">Logo</div>
+          <div className="text-white font-bold text-xl">LearnLedger</div>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
@@ -25,9 +25,12 @@ const Navbar = () => {
             <NavLink to="/articles" className="text-gray-300 hover:text-white transition-colors">
               Articles
             </NavLink>
-            <a href="/write" className="text-gray-300 hover:text-white transition-colors">
+            <NavLink to="/write" className="text-gray-300 hover:text-white transition-colors">
               Write
-            </a>
+            </NavLink>
+            <NavLink to="/createQuiz" className="text-gray-300 hover:text-white transition-colors">
+              createQuiz
+            </NavLink>
          <ConnectWallet/>
           </div>
 

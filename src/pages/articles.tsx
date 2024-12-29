@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router";
+import  { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Web3 from "web3";
 import { ArticlesABI, CONTRACT_ADDRESS } from "../web3/articlesABI";
 
 interface Article {
   id: string;
   title: string;
-  difficulty: "Easy" | "Medium" | "Hard";
+  difficulty: "Beginner" | "Intermediate" | "Advanced";
   readTime: number;
   category: string;
   views: number;
@@ -29,11 +29,11 @@ const ArticlesTab = () => {
 
   const getDifficultyColor = (difficulty: Article["difficulty"]) => {
     switch (difficulty) {
-      case "Easy":
+      case "Beginner":
         return "text-green-500 dark:text-green-400";
-      case "Medium":
+      case "Intermediate":
         return "text-yellow-500 dark:text-yellow-400";
-      case "Hard":
+      case "Advanced":
         return "text-red-500 dark:text-red-400";
       default:
         return "text-gray-500 dark:text-gray-400";
@@ -57,7 +57,7 @@ const ArticlesTab = () => {
       const contract = new web3.eth.Contract(ArticlesABI, CONTRACT_ADDRESS);
 
       // Fetch articles from the smart contract
-      const articlesFromContract = await contract.methods.getArticles().call();
+      const articlesFromContract : any= await contract.methods.getArticles().call();
 
       // Map the articles to match the Article interface
       const mappedArticles: Article[] = articlesFromContract.map(
@@ -90,7 +90,7 @@ const ArticlesTab = () => {
       : articles.filter((article) => article.category === activeCategory);
 
   return (
-    <div className="max-w-screen mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div className="w-full mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
       {/* Category Tabs */}
       <div className="border-b border-gray-200 dark:border-gray-700 mb-8">
         <div className="flex overflow-x-auto no-scrollbar">
@@ -162,4 +162,4 @@ const ArticlesTab = () => {
   );
 };
 
-export default ArticlesTab;
+export default ArticlesTab;

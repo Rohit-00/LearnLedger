@@ -35,6 +35,18 @@ export const ArticlesABI = [
 			{
 				"indexed": false,
 				"internalType": "uint256",
+				"name": "readTime",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "views",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
 				"name": "timestamp",
 				"type": "uint256"
 			}
@@ -63,12 +75,79 @@ export const ArticlesABI = [
 				"internalType": "string",
 				"name": "_difficulty",
 				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_readTime",
+				"type": "uint256"
 			}
 		],
 		"name": "createArticle",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "incrementViews",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_user",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_articleId",
+				"type": "uint256"
+			}
+		],
+		"name": "rewardUser",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "articleId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "UserRewarded",
+		"type": "event"
 	},
 	{
 		"inputs": [
@@ -115,6 +194,16 @@ export const ArticlesABI = [
 					{
 						"internalType": "uint256",
 						"name": "timestamp",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "readTime",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "views",
 						"type": "uint256"
 					}
 				],
@@ -179,6 +268,16 @@ export const ArticlesABI = [
 						"internalType": "uint256",
 						"name": "timestamp",
 						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "readTime",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "views",
+						"type": "uint256"
 					}
 				],
 				"internalType": "struct ArticleManager.Article[]",
@@ -188,7 +287,26 @@ export const ArticlesABI = [
 		],
 		"stateMutability": "view",
 		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "getViews",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
 	}
 ]
 
-export const CONTRACT_ADDRESS = "0xEeEB1166BA3aa690A1A08B7B21564C4Ac088906a"
+export const CONTRACT_ADDRESS = "0xBd7b7cf3420Ba9411886DA5D5523CB8F7FeCF14f"
